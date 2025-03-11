@@ -11,7 +11,8 @@
 using namespace std; // используем пространство имен std для того, чтобы не писать перед функциями cin, cout "std"
 using namespace chrono; // пространство имён chrono предназначено для работы с датой и временем
 
-/// функция заполнения массива случайными числами
+
+/// шаблон функции заполнения массива случайными числами
 /// size_t n - размер массива, Temp start - начальный элемент, Temp fin - конечный элемент
 template <typename Temp>
 Temp* Arr_create(size_t n, Temp start, Temp fin)
@@ -40,7 +41,7 @@ Temp* Arr_create(size_t n, Temp start, Temp fin)
 	}
 }
 
-/// функция заполнения массива случайными числами монотонно
+/// шаблон функции заполнения массива случайными числами монотонно возрастающими
 /// size_t n - размер массива, Temp start - начальный элемент, Temp fin - конечный элемент
 template <typename Temp>
 Temp* Arr_create_m(size_t n, Temp start, Temp fin)
@@ -71,10 +72,10 @@ Temp* Arr_create_m(size_t n, Temp start, Temp fin)
 	}
 }
 
-/// функция проверки сортировки массива по возрастанию
+/// шаблон функции проверки сортировки массива по возрастанию
 /// size_t n - размер массива, Temp* arr - массив
 template <typename Temp>
-bool Arr_sort(size_t n, Temp* arr)
+bool Arr_is_sort(size_t n, Temp* arr)
 {
 	for (size_t i = 1; i < n; i++)
 	{
@@ -86,22 +87,22 @@ bool Arr_sort(size_t n, Temp* arr)
 	return true; // возвращаем правду
 }
 
-/// функция нахождения элемента в массиве
+/// шаблон функции нахождения элемента в массиве
 /// size_t n - размер массива, Temp* arr - массив, Temp el - нужный элемент
 template <typename Temp>
-bool Arr_elem(size_t n, Temp* arr, Temp el)
+size_t Arr_elem(size_t n, Temp* arr, Temp el)
 {
 	for (size_t i = 0; i < n; i++)
 	{
 		if (arr[i] == el) // если элемент массива = нужному элементу
 		{
-			return true; // возвращаем правду
+			return i+1; // возвращаем правду
 		}
 	}
-	return false; // возвращаем ложь
+	return 0; // возвращаем ложь
 }
 
-/// функция нахождения времени работы функции
+/// шаблон функции нахождения времени работы функции
 /// Temp func - функция, время работы которой нужно определить
 template <typename Temp>
 int Time_func(Temp func)
@@ -113,7 +114,7 @@ int Time_func(Temp func)
 	return delta.count(); // возвращаем результат
 }
 
-/// функция нахождения общего времени работы программы
+/// шаблон функции нахождения общего времени работы программы
 /// size_t n - размер массива, Temp start - начальный элемент случайных чисел, Temp fin - конечный элемент случайных чисел, Temp* arr - массив
 template <typename Temp>
 void Time_tot(size_t n, Temp start, Temp fin, Temp* arr)
@@ -124,13 +125,13 @@ void Time_tot(size_t n, Temp start, Temp fin, Temp* arr)
 	int start_time = 0; // начальное время
 	for (int i = 0; i < 100; i++)
 	{
-		Temp find_el = arr[dist_fil(gen)];
-		start_time += Time_func([&]() {bool k = Arr_elem<Temp>(n, arr, find_el); });
+		Temp find_el = dist_fil(gen);
+		start_time += Time_func([&]() {bool k = Arr_elem<Temp>(n, arr, find_el); }); // определение времени работы программы
 	}
 	cout << start_time / 100.0;
 }
 
-/// функция сохранения массива в файл
+/// шаблон функции сохранения массива в файл
 /// size_t n - размер массива, string namef - имя файла, Temp* arr - массив
 template <typename Temp>
 void Save_f(size_t n, string namef, Temp* arr)
@@ -147,37 +148,197 @@ void Save_f(size_t n, string namef, Temp* arr)
 	f.close(); // закрываем файл
 }
 
-/*/// функция бинарного поиска элемента в массиве
-/// size_t n - размер массива, Temp* arr - массив, Temp el - нужный элемент
+/// бинарный поиск элемента в массиве
+/// возвращает место элемента в массиве(индекс + 1), если элемента нет, то возвращает 0
+/// BigO time (best - 1; average - log(n); worst - log(n))
+/// BigO space (1)
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива, Temp elem - искомый элемент
 template <typename Temp>
-Temp* Arr_elem_b(size_t n, Temp* arr, Temp el)
+size_t BynFind(Temp* arr, size_t left, size_t right, Temp elem)
 {
-	int mid;
-	int l;
-	if (n == 1)
+	while (left <= right) // пока границы не будут равны
 	{
-		arr = el;
-		if (arr == el)
+		size_t mid = left + (right - left) / 2; // находим середину границ массива
+		if (elem == arr[mid]) // если искомый элемент равен элементу в середине границ массива
+			return mid + 1; // возвращаем индекс + 1;
+		if (elem > arr[mid]) // если искомый элемент больше элемента в середине границ массива
+			left = mid + 1; // ищем в правой части
+		if (elem < arr[mid]) // если искомый элемент меньше элемента в середине границ массива
+			right = mid - 1; // ищем в левой части
+	}
+	return 0; // если элемент не найден, то возвращаем 0
+}
+
+/// итерационный поиск элемента в массиве
+/// возвращает место элемента в массиве(индекс + 1), если элемента нет, то возвращает 0
+/// BigO time (average - log2(log2(n)); worst - n)
+/// BigO space (1)
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива, Temp elem - искомый элемент
+template <typename Temp>
+size_t InterFind(Temp* arr, size_t left, size_t right, Temp elem)
+{
+	size_t index = 0; // индекс элемента
+	if (left <= right && elem >= arr[left] && elem <= arr[right]) // пока элемент в границах массива
+	{
+		if (arr[index] == elem) // если искомый элемент равен элементу в массиве на вычисленной позиции
+			return index + 1; // возвращаем индекс + 1;
+		index = left + (((double)(right-left)/(arr[right]-arr[left]))*(elem-arr[left])); // вычисляем индекс по формуле
+		if (arr[index] == elem) // если искомый элемент равен элементу в массиве на вычисленной позиции
+			return index + 1; // возвращаем индекс + 1;
+		if (arr[index] < elem) // если искомый элемент больше элемента в массиве на вычисленной позиции
+			return InterFind(arr, index + 1, right, elem); // ищем правее
+		if (arr[index] > elem) // если искомый элемент меньше элемента в массиве на вычисленной позиции
+			return InterFind(arr, left, index - 1, elem); // ищем левее
+	}
+	return 0; // если элемент не найден, то возвращаем 0
+}
+
+/// шаблон функции сортировки пузырьком
+/// BigO time (best - n; average - n^2; worst - n^2)
+/// BigO space (1)
+/// Temp* arr - массив, size_t n - размер массива
+template <typename Temp>
+void BubleSort(Temp* arr, size_t n)
+{
+	for (size_t i = 0; i < n - 1; i++) // пока не конец массива
+	{
+		for (size_t j = 0; j < n - i - 1; j++) // если последние элементы на правильном месте
 		{
-			return arr;
+			if (arr[j] > arr[j + 1]) // сравнение соседних элементов
+				swap(arr[j], arr[j + 1]); // меняем местами
 		}
-		else cout << "Элемент не найден";
+	}
+}
+
+/// шаблон функции разбиения массива(элементы меньше находятся слева от определённого элемента piv, а большие справа)
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива, Temp piv - определённый элемент
+template <typename Temp>
+size_t Partit(Temp* arr, size_t left, size_t right, Temp piv)
+{
+	size_t Pind = left; // левая граница
+	for (size_t i = left; i <= right; i++)
+	{
+		if (arr[i] <= piv) // если текущий элемент меньше чем определённый
+		{
+			swap(arr[Pind], arr[i]); // меняем местами элемент [Pind] с текущим элементом
+			Pind++; // увеличиваем индекс
+		}
+	}
+	return Pind-1; // возвращаем элемент
+}
+
+/// шаблон функции сортировки QuickSort
+/// BigO time (best - n*log(n); average - n*log(n); worst - n^2)
+/// BigO space (log(n))
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива
+template <typename Temp>
+void QuickSort(Temp* arr, size_t left, size_t right)
+{
+	if (left < right)
+	{
+		Temp pivot = arr[right]; // определённый элемент - правая граница массива
+		size_t Pind = Partit(arr, left, right, pivot); // получаем фактический индекс определённого осевого элемента
+		QuickSort(arr, left, Pind - 1); // рекурсивно вызываем функцию
+		QuickSort(arr, Pind + 1, right); // рекурсивно вызываем функцию
+	}
+}
+
+/// шаблон функции сортировки Шелла
+/// BigO time (best - n*log(n); average - (n*log(n))^2; worst - (n*log(n))^2)
+/// BigO space (1)
+/// Temp* arr - массив, size_t n - размер массива
+template <typename Temp>
+void ShellSort(Temp* arr, size_t n)
+{
+	for (size_t gap = n / 2; gap > 0; gap = gap / 2) // начнинаем с большого промежутка, затем уменьшаем
+	{
+		for (size_t i = gap; i < n; i++)
+		{
+			Temp temp = arr[i]; // сохраняем arr[i] в temp
+			size_t j;
+			for (j = i; j >= gap && arr[j - gap] > temp; j = j - gap)
+			{
+				arr[j] = arr[j - gap]; // сдвигаем ранее отсортированные по промежутку элементы вверх до тех пор, пока не будет найдено правильное местоположение для arr[i]
+			}
+			arr[j] = temp; // помещаем temp(исходный arr[i]) в нужное место
+		}
+	}
+}
+
+/// шаблон функции слияния двух подмассивов из массива arr[]
+/// первый подмассив arr[left..mid], второй подмассив arr[mid+1..right]
+/// Temp* arr - массив, size_t left - левая граница массива, size_t mid - середина массива, size_t right - правая граница массива
+template <typename Temp>
+void merge(Temp* arr, size_t left, size_t mid, size_t right)
+{
+	size_t n1 = mid - left + 1;
+	size_t n2 = right - mid;
+	Temp* L = new Temp(n1); // создание подмассива
+	Temp* R = new Temp(n2); // создание подмассива
+	for (size_t i = 0; i < n1; i++)
+	{
+		L[i] = arr[left + i];
+	}
+	for (size_t i = 0; i < n2; i++)
+	{
+		R[i] = arr[mid + 1 + i];
+	}
+	size_t i = 0;
+	size_t j = 0;
+	size_t k = left;
+	while ((i < n1) && (j < n2)) // слияние подмассивов обратно в arr[left..right]
+	{
+		if (L[i] <= R[j])
+		{
+			arr[k] = L[i];
+			i++;
+		}
+		else
+		{
+			arr[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+	while (i < n1) // копируем оставшиеся элементы подмассива L
+	{
+		arr[k] = L[i];
+		i++;
+		k++;
+	}
+	while (j < n2) // копируем оставшиеся элементы подмассива R
+	{
+		arr[k] = R[j];
+		j++;
+		k++;
+	}
+}
+
+/// функция сортировки слиянием
+/// BigO time (best - n*log(n); average - n*log(n); worst - n*log(n))
+/// BigO space (n)
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива
+template <typename Temp>
+void MergeSort(Temp* arr, size_t left, size_t right)
+{
+	if (left >= right)
 		return;
-	}
-	else 
-	{
-		mid = n / 2;
-		if (arr[mid] < el)
-		{
-			l = mid + 1;
-		}
-		if (arr[mid] > el)
-		{
-			l = mid - 1;
-		}
-		if (arr[mid] == el)
-		{
-			return mid;
-		}
-	}
-}*/
+	size_t mid = left + (right - left) / 2;
+	MergeSort(arr, left, mid);
+	MergeSort(arr, mid + 1, right);
+	merge(arr, left, mid, right);
+}
+
+void test_for_is_sort();
+
+void test_for_find_pos();
+
+void test_for_byn_iter_find();
+
+void test_bublsort();
+
+void test_quicksort();
+
+void test_shellsort();
+
+void test_mergesort();
