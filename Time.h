@@ -21,7 +21,7 @@ Temp* Arr_create(size_t n, Temp start, Temp fin)
 	mt19937 gen(rand()); // генератор случайных чисел, mt19937 - один из вариантов генератора псевдослучайных чисел Вихря Мерсена
 	if (typeid(Temp) == typeid(int)) // если тип целочисленный
 	{
-		uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне 
+		uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне, uniform_int_distribution - равномерное распределение
 		Temp* arr = new Temp[n]; // создание целочисленного массива
 		for (size_t i = 0; i < n; i++)
 		{
@@ -31,7 +31,7 @@ Temp* Arr_create(size_t n, Temp start, Temp fin)
 	}
 	else // иначе
 	{
-		uniform_real_distribution<> dist_fil(start, fin); // генерирует случайные вещественные значения, которые имеют равномерное распределение в заданном диапазоне
+		uniform_real_distribution<> dist_fil(start, fin); // генерирует случайные вещественные значения, которые имеют равномерное распределение в заданном диапазоне, uniform_real_distribution - равномерное распределение
 		Temp* arr = new Temp[n]; // создание вещественного массива
 		for (size_t i = 0; i < n; i++)
 		{
@@ -50,7 +50,7 @@ Temp* Arr_create_m(size_t n, Temp start, Temp fin)
 	mt19937 gen(rand()); // инициализация метода рандома, mt19937 - один из вариантов генератора псевдослучайных чисел Вихря Мерсена
 	if (typeid(Temp) == typeid(int)) // если тип целочисленный
 	{
-		uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне
+		uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне, uniform_int_distribution - равномерное распределение
 		Temp* arr = new Temp[n]; // создание целочисленного массива
 		arr[0] = dist_fil(gen); // нулевой элемент массива = случайное число
 		for (size_t i = 1; i < n; i++)
@@ -61,7 +61,7 @@ Temp* Arr_create_m(size_t n, Temp start, Temp fin)
 	}
 	else // иначе
 	{
-		uniform_real_distribution<> dist_fil(start, fin); // генерирует случайные вещественные значения, которые имеют равномерное распределение в заданном диапазоне
+		uniform_real_distribution<> dist_fil(start, fin); // генерирует случайные вещественные значения, которые имеют равномерное распределение в заданном диапазоне, uniform_real_distribution - равномерное распределение
 		Temp* arr = new Temp[n]; // создание вещественного массива
 		arr[0] = dist_fil(gen); // нулевой элемент массива = случайное число
 		for (size_t i = 1; i < n; i++)
@@ -75,7 +75,7 @@ Temp* Arr_create_m(size_t n, Temp start, Temp fin)
 /// шаблон функции проверки сортировки массива по возрастанию
 /// size_t n - размер массива, Temp* arr - массив
 template <typename Temp>
-bool Arr_is_sort(size_t n, Temp* arr)
+bool Arr_is_sorted(size_t n, Temp* arr)
 {
 	for (size_t i = 1; i < n; i++)
 	{
@@ -88,6 +88,7 @@ bool Arr_is_sort(size_t n, Temp* arr)
 }
 
 /// шаблон функции нахождения элемента в массиве
+/// возвращает место элемента в массиве(индекс + 1), если элемента нет, то возвращает 0
 /// size_t n - размер массива, Temp* arr - массив, Temp el - нужный элемент
 template <typename Temp>
 size_t Arr_elem(size_t n, Temp* arr, Temp el)
@@ -121,7 +122,7 @@ void Time_tot(size_t n, Temp start, Temp fin, Temp* arr)
 {
 	random_device rand; // равномерно распределённый генератор случайных чисел, который выдаёт недетерминированные случайные числа
 	mt19937 gen(rand()); // инициализация метода рандома, mt19937 - один из вариантов генератора псевдослучайных чисел Вихря Мерсена
-	uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне
+	uniform_int_distribution<> dist_fil(start, fin); // создаёт случайные целочисленные значения с одинаковой вероятностью в заданном диапазоне, uniform_int_distribution - равномерное распределение
 	int start_time = 0; // начальное время
 	for (int i = 0; i < 100; i++)
 	{
@@ -134,7 +135,7 @@ void Time_tot(size_t n, Temp start, Temp fin, Temp* arr)
 /// шаблон функции сохранения массива в файл
 /// size_t n - размер массива, string namef - имя файла, Temp* arr - массив
 template <typename Temp>
-void Save_f(size_t n, string namef, Temp* arr)
+void Save_f(size_t n, const string& namef, Temp* arr)
 {
 	ofstream f; // ofstream для записи в файл
 	f.open(namef); //открываем файл
@@ -169,7 +170,7 @@ size_t BynFind(Temp* arr, size_t left, size_t right, Temp elem)
 	return 0; // если элемент не найден, то возвращаем 0
 }
 
-/// итерационный поиск элемента в массиве
+/// интерполяционный поиск элемента в массиве
 /// возвращает место элемента в массиве(индекс + 1), если элемента нет, то возвращает 0
 /// BigO time (average - log2(log2(n)); worst - n)
 /// BigO space (1)
@@ -193,13 +194,17 @@ size_t InterFind(Temp* arr, size_t left, size_t right, Temp elem)
 	return 0; // если элемент не найден, то возвращаем 0
 }
 
-/// шаблон функции сортировки пузырьком
+/// шаблон функции сортировки по возрастанию пузырьком
 /// BigO time (best - n; average - n^2; worst - n^2)
 /// BigO space (1)
 /// Temp* arr - массив, size_t n - размер массива
 template <typename Temp>
 void BubleSort(Temp* arr, size_t n)
 {
+	if (n == 1)
+	{
+		return;
+	}
 	for (size_t i = 0; i < n - 1; i++) // пока не конец массива
 	{
 		for (size_t j = 0; j < n - i - 1; j++) // если последние элементы на правильном месте
@@ -210,15 +215,15 @@ void BubleSort(Temp* arr, size_t n)
 	}
 }
 
-/// шаблон функции разбиения массива(элементы меньше находятся слева от определённого элемента piv, а большие справа)
-/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива, Temp piv - определённый элемент
+/// шаблон функции разбиения массива(элементы меньше находятся слева от осевого элемента piv, а большие справа)
+/// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива, Temp piv - осевой элемент
 template <typename Temp>
 size_t Partit(Temp* arr, size_t left, size_t right, Temp piv)
 {
 	size_t Pind = left; // левая граница
 	for (size_t i = left; i <= right; i++)
 	{
-		if (arr[i] <= piv) // если текущий элемент меньше чем определённый
+		if (arr[i] <= piv) // если текущий элемент меньше чем осевой
 		{
 			swap(arr[Pind], arr[i]); // меняем местами элемент [Pind] с текущим элементом
 			Pind++; // увеличиваем индекс
@@ -227,7 +232,7 @@ size_t Partit(Temp* arr, size_t left, size_t right, Temp piv)
 	return Pind-1; // возвращаем элемент
 }
 
-/// шаблон функции сортировки QuickSort
+/// шаблон функции сортировки по возрастанию QuickSort
 /// BigO time (best - n*log(n); average - n*log(n); worst - n^2)
 /// BigO space (log(n))
 /// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива
@@ -238,18 +243,27 @@ void QuickSort(Temp* arr, size_t left, size_t right)
 	{
 		Temp pivot = arr[right]; // определённый элемент - правая граница массива
 		size_t Pind = Partit(arr, left, right, pivot); // получаем фактический индекс определённого осевого элемента
+		if (right == left + 1)
+		{
+			return;
+		}
 		QuickSort(arr, left, Pind - 1); // рекурсивно вызываем функцию
 		QuickSort(arr, Pind + 1, right); // рекурсивно вызываем функцию
 	}
+	return;
 }
 
-/// шаблон функции сортировки Шелла
+/// шаблон функции сортировки по возрастанию Шелла
 /// BigO time (best - n*log(n); average - (n*log(n))^2; worst - (n*log(n))^2)
 /// BigO space (1)
 /// Temp* arr - массив, size_t n - размер массива
 template <typename Temp>
 void ShellSort(Temp* arr, size_t n)
 {
+	if (n == 1)
+	{
+		return;
+	}
 	for (size_t gap = n / 2; gap > 0; gap = gap / 2) // начнинаем с большого промежутка, затем уменьшаем
 	{
 		for (size_t i = gap; i < n; i++)
@@ -258,7 +272,7 @@ void ShellSort(Temp* arr, size_t n)
 			size_t j;
 			for (j = i; j >= gap && arr[j - gap] > temp; j = j - gap)
 			{
-				arr[j] = arr[j - gap]; // сдвигаем ранее отсортированные по промежутку элементы вверх до тех пор, пока не будет найдено правильное местоположение для arr[i]
+				arr[j] = arr[j - gap]; // сдвигаем ранее отсортированные по промежутку элементы до тех пор, пока не будет найдено правильное местоположение для arr[i]
 			}
 			arr[j] = temp; // помещаем temp(исходный arr[i]) в нужное место
 		}
@@ -314,7 +328,7 @@ void merge(Temp* arr, size_t left, size_t mid, size_t right)
 	}
 }
 
-/// функция сортировки слиянием
+/// функция сортировки по возрастанию слиянием
 /// BigO time (best - n*log(n); average - n*log(n); worst - n*log(n))
 /// BigO space (n)
 /// Temp* arr - массив, size_t left - левая граница массива, size_t right - правая граница массива
@@ -323,22 +337,49 @@ void MergeSort(Temp* arr, size_t left, size_t right)
 {
 	if (left >= right)
 		return;
-	size_t mid = left + (right - left) / 2;
+	size_t mid = left + (right - left) / 2; // вычисляем середину массива
 	MergeSort(arr, left, mid);
 	MergeSort(arr, mid + 1, right);
 	merge(arr, left, mid, right);
 }
 
-void test_for_is_sort();
+/// Сортировка вставками по возрастанию
+/// BigO time (best - n; average - n^2; worst - n^2)
+/// BigO space (1)
+/// Temp* arr - массив, size_t n - размер массива
+template <typename Temp>
+void InsertSort(Temp* arr, size_t n)
+{
+	if (n == 1)
+	{
+		return;
+	}
+	for (size_t i = 1; i < n; i++)
+	{
+		Temp key = arr[i];
+		size_t j = i - 1;
+		
+		while (j >= 0 && arr[j] > key) // двигаем элементы arr[0..i-1], больше ключевого элемента на одну позицию выше их текущей позиции
+		{
+			arr[j + 1] = arr[j];
+			j = j - 1;
+		}
+		arr[j + 1] = key;
+	}
+}
 
-void test_for_find_pos();
+void test_for_is_sort(); // тестирование функции сортировки массива
 
-void test_for_byn_iter_find();
+void test_for_find_pos(); // тестирование функции нахождения элемента в массиве
 
-void test_bublsort();
+void test_for_byn_iter_find(); // тестирование функций бинарного и интерполяционного поиска элемента в массиве
 
-void test_quicksort();
+void test_bublsort(); // тестирование функции сортировки пузырьком
 
-void test_shellsort();
+void test_quicksort(); // тестирование функции сортировки QuickSort
 
-void test_mergesort();
+void test_shellsort(); // тестирование функции функции сортировки Шелла
+
+void test_mergesort(); // тестирование функции сортировки слиянием
+
+void test_insertsort(); // тестирование функции сортировки вставками
